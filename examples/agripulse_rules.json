@@ -1,0 +1,15 @@
+{
+  "preserve": [{"table": "readings", "key": ["id"]}],
+  "assertions": [
+    {
+      "name": "Devices match legacy identities and timestamps",
+      "query": "WITH expected AS (SELECT r.device_id, r.zone_id, r.source, d.first_seen, r.recorded_at AS last_seen FROM baseline.readings r JOIN (SELECT device_id, MIN(recorded_at) AS first_seen, MAX(id) AS latest FROM baseline.readings GROUP BY device_id) d ON r.id = d.latest), missing AS (SELECT * FROM expected EXCEPT SELECT device_id, zone_id, source, first_seen, last_seen FROM main.devices), extra AS (SELECT device_id, zone_id, source, first_seen, last_seen FROM main.devices EXCEPT SELECT * FROM expected) SELECT (SELECT COUNT(*) FROM missing) + (SELECT COUNT(*) FROM extra)",
+      "equals": 0
+    },
+    {
+      "name": "Legacy thresholds copied to both modes",
+      "query": "WITH expected AS (SELECT zone_id, 'device' AS source, moisture_min FROM baseline.thresholds UNION ALL SELECT zone_id, 'simulator', moisture_min FROM baseline.thresholds), missing AS (SELECT * FROM expected EXCEPT SELECT zone_id, source, moisture_min FROM main.thresholds) SELECT COUNT(*) FROM missing",
+      "equals": 0
+    }
+  ]
+}

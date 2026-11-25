@@ -1,0 +1,72 @@
+{
+  "format_version": 1,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "SQLite integrity",
+      "status": "passed",
+      "detail": "ok"
+    },
+    {
+      "name": "Foreign keys",
+      "status": "passed",
+      "violations": []
+    },
+    {
+      "name": "Preserve readings",
+      "status": "passed",
+      "before_count": 3,
+      "after_count": 3,
+      "removed": {
+        "count": 0,
+        "keys": []
+      },
+      "added": {
+        "count": 0,
+        "keys": []
+      },
+      "changed": {
+        "count": 0,
+        "keys": []
+      }
+    },
+    {
+      "name": "Devices match legacy identities and timestamps",
+      "status": "passed",
+      "expected": 0,
+      "actual": 0
+    },
+    {
+      "name": "Legacy thresholds copied to both modes",
+      "status": "passed",
+      "expected": 0,
+      "actual": 0
+    }
+  ],
+  "schema": {
+    "before_version": 0,
+    "after_version": 1,
+    "changes": [
+      {
+        "type": "index",
+        "name": "readings_retention",
+        "change": "added"
+      },
+      {
+        "type": "index",
+        "name": "readings_zone_source",
+        "change": "added"
+      },
+      {
+        "type": "table",
+        "name": "devices",
+        "change": "added"
+      },
+      {
+        "type": "table",
+        "name": "thresholds",
+        "change": "changed"
+      }
+    ]
+  }
+}

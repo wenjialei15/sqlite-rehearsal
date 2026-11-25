@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="在 SQLite 数据库副本上演练迁移，检查结构变化、历史数据和业务规则。">
+  <title>SQLite Rehearsal · SQLite 升级演练</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <nav class="wrap nav" aria-label="主导航">
+      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">R</span> SQLite Rehearsal</a>
+      <a class="nav-repo" href="https://github.com/wenjialei15/sqlite-rehearsal">GitHub 源码</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="title">
+      <div class="wrap hero-grid">
+        <div>
+          <h1 id="title">先在副本上演练，<br>再升级 SQLite。</h1>
+          <p>用 Python 在只读快照的副本上运行迁移。对比表结构、逐行核验需要保留的数据，并检查你的业务规则。</p>
+          <a class="hero-action" href="#demo">查看演练报告</a>
+        </div>
+        <ol class="flow" aria-label="演练流程">
+          <li><span class="flow-step">01</span><div><strong>拍摄旧库快照</strong><small>SQLite Backup API · 只读打开源库</small></div></li>
+          <li><span class="flow-step">02</span><div><strong>在临时副本执行迁移</strong><small>SQL 文件或项目自己的迁移命令</small></div></li>
+          <li><span class="flow-step">03</span><div><strong>核对升级结果</strong><small>检查清单 · 差异记录 · JSON 报告</small></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="demo" class="wrap demo" aria-labelledby="demo-title">
+      <div class="demo-heading">
+        <div>
+          <h2 id="demo-title">演练报告</h2>
+          <p>切换 AgriPulse 的两份示例，或打开本机 CLI 生成的 JSON 报告。</p>
+        </div>
+        <div class="upload">
+          <label class="file-label" for="report-file">打开本地 JSON</label>
+          <input id="report-file" type="file" accept=".json,application/json" aria-describedby="privacy">
+          <p id="privacy">浏览器本地读取文件。</p>
+        </div>
+      </div>
+      <div class="scenario" role="group" aria-label="AgriPulse 示例报告">
+        <button type="button" data-sample="pass" aria-pressed="true">正常升级</button>
+        <button type="button" data-sample="fail" aria-pressed="false">丢失读数</button>
+      </div>
+      <p class="message" id="message" role="status" hidden></p>
+      <div class="report" id="report" hidden>
+        <div class="report-head">
+          <h3 id="report-title"></h3>
+          <p class="status" id="report-status" role="status"></p>
+        </div>
+        <div class="stats">
+          <div><span>Schema 版本</span><strong id="versions">—</strong></div>
+          <div><span>通过检查</span><strong id="passed">—</strong></div>
+          <div><span>结构变更</span><strong id="schema-count">—</strong></div>
+        </div>
+        <div class="report-body">
+          <section aria-labelledby="checks-title">
+            <h4 id="checks-title">核验结果</h4>
+            <ul id="checks" class="checks"></ul>
+          </section>
+          <section aria-labelledby="schema-title">
+            <h4 id="schema-title">结构变更</h4>
+            <ul id="schema" class="schema"></ul>
+          </section>
+        </div>
+      </div>
+      <noscript><p>报告查看器需要 JavaScript。也可以下载 <a href="sample-pass.json">通过报告</a>和 <a href="sample-fail.json">失败报告</a>。</p></noscript>
+    </section>
+
+    <section class="wrap usage" aria-labelledby="usage-title">
+      <div>
+        <h2 id="usage-title">在项目里运行</h2>
+        <p>在本机用 Python 3.9+ 运行。命令执行后，将生成的 <code>report.json</code> 打开即可查看结果。</p>
+        <a href="https://github.com/wenjialei15/sqlite-rehearsal#快速体验">查看完整用法</a>
+      </div>
+      <pre><code>python sqlite_rehearsal.py legacy.db --sql upgrade.sql --rules rules.json --report report.json</code></pre>
+    </section>
+  </main>
+
+  <footer class="wrap footer"><span>SQLite Rehearsal</span><a href="https://github.com/wenjialei15/sqlite-rehearsal/blob/main/LICENSE">MIT License</a></footer>
+</body>
+</html>
