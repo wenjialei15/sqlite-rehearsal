@@ -13,6 +13,7 @@ from pathlib import Path
 
 
 SAMPLE_LIMIT = 10
+MAX_SAFE_JSON_INTEGER = (1 << 53) - 1
 
 
 def readonly(path):
@@ -149,6 +150,8 @@ def key_data(db, relation, keys):
 def json_value(value):
     if isinstance(value, bytes):
         return {"blob_hex": value.hex()}
+    if isinstance(value, int) and abs(value) > MAX_SAFE_JSON_INTEGER:
+        return str(value)
     if isinstance(value, float) and value in (float("inf"), float("-inf")):
         return str(value)
     return value
@@ -209,7 +212,7 @@ def assert_scalar(db, rule):
         if len(rows) != 1 or len(rows[0]) != 1:
             return check(rule["name"], False, detail="Expected exactly one row and one column")
         actual = rows[0][0]
-        return check(rule["name"], actual == expected, expected=expected, actual=json_value(actual))
+        return check(rule["name"], actual == expected, expected=json_value(expected), actual=json_value(actual))
     except sqlite3.Error as error:
         return check(rule["name"], False, detail=str(error))
 

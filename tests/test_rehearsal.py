@@ -108,6 +108,19 @@ class RehearsalTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stderr)
         self.assertIn("non-null and unique", self.read_report()["checks"][2]["detail"])
 
+    def test_report_keeps_full_precision_for_large_sqlite_primary_keys(self):
+        key = 9223372036854775807
+        self.setup_db(f"CREATE TABLE items (id INTEGER PRIMARY KEY); INSERT INTO items VALUES ({key});")
+        result = self.run_sql("DELETE FROM items;", {
+            "preserve": [{"table": "items", "key": ["id"]}],
+            "assertions": [{"name": "Largest id", "query": "SELECT MAX(id) FROM baseline.items", "equals": key}],
+        })
+        self.assertEqual(result.returncode, 2, result.stderr)
+        checks = self.read_report()["checks"]
+        self.assertEqual(checks[2]["removed"]["keys"], [{"id": str(key)}])
+        self.assertEqual(checks[3]["status"], "passed")
+        self.assertEqual(checks[3]["actual"], str(key))
+
     def test_does_not_overwrite_report(self):
         self.setup_db("CREATE TABLE items (id INTEGER);")
         self.report.write_text("keep this", encoding="utf-8")
